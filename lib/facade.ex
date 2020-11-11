@@ -6,24 +6,43 @@ defprotocol ProtocolFacade do
   def stop_server(data \\ nil)
 end
 
-defimpl ProtocolFacade, for: Any do
+defimpl ProtocolFacade, for: ScheduleServer do
   def start_server(data) do
-    {:ok, schedule_pid} = ScheduleServer.start_link(data)
-    ScheduleServer.write_value(schedule_pid, "Config")
-    ScheduleServer.read_system(schedule_pid)
+
+    if data.state == :true do
+      ScheduleServer.start_link(data)
+      ScheduleServer.turn_on(data.state)
+      ScheduleServer.read_system()
+    else
+      "For start state must be in true"
+    end
   end
 
   def stop_server(data) do
-    {:ok, schedule_pid} = ScheduleServer.start_link(data)
-    ScheduleServer.destroy(schedule_pid, "Destroying")
-    config = ScheduleServer.read_system(schedule_pid)
-    ScheduleServer.shut_down(schedule_pid, config <> " and Shut Down...")
-    ScheduleServer.read_system(schedule_pid)
+
+    if data.state == :false do
+      ScheduleServer.start_link(data)
+      ScheduleServer.shut_down(data.state)
+      ScheduleServer.read_system()
+    else
+    "For stop state must be in false"
+    end
+  end
+end
+
+defimpl ProtocolFacade, for: Any do
+  def start_server(data) do
+   "Not implemented start_server for Any, data is #{data}"
+  end
+
+  def stop_server(data) do
+ "Not implemented stop_server for Any, data is #{data}"
   end
 end
 
 
 #ejecucion
-# schedule = %ScheduleServer{}
+# schedule = %ScheduleServer{state: :true}
+# schedule = %ScheduleServer{state: :false}
 # ProtocolFacade.start_server(schedule)
 # ProtocolFacade.stop_server(schedule)

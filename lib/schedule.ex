@@ -1,45 +1,39 @@
 defmodule ScheduleServer do
   use GenServer
 
+  @name ScheduleServer
+
   defstruct [:state]
 
   def start_link(initial_value) do
-    GenServer.start_link(__MODULE__, initial_value)
+    GenServer.start_link(__MODULE__, initial_value ,name: @name)
   end
 
   def init(value) do
     {:ok, value}
   end
 
-  def read_system(pid) do
-    GenServer.call(pid, :read_system)
+  def read_system() do
+    GenServer.call(@name, :read_system)
   end
 
-  def write_value(pid, new_value) do
-    GenServer.call(pid, {:write_value, new_value})
+  def turn_on(value) do
+    GenServer.call(@name, {:turn_on, value})
   end
 
-  def destroy(pid, new_value) do
-    GenServer.call(pid, {:destroy, new_value})
-  end
-
-  def shut_down(pid, new_value) do
-    GenServer.call(pid, {:shut_down, new_value})
+  def shut_down(value) do
+    GenServer.call(@name, {:shut_down, value})
   end
 
   def handle_call(:read_system, _from, value) do
     {:reply, value, value}
   end
 
-  def handle_call({:write_value, new_value}, _from, _) do
-    {:reply, :ok, new_value}
+  def handle_call({:turn_on, value}, _from, _) do
+    {:reply, :ok, value}
   end
 
-  def handle_call({:destroy, new_value}, _from, _) do
-    {:reply, :ok, new_value}
-  end
-
-  def handle_call({:shut_down, new_value}, _from, _) do
-    {:reply, :ok, new_value}
+  def handle_call({:shut_down, value}, _from, _) do
+    {:reply, :ok, value}
   end
 end

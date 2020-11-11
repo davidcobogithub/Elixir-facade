@@ -3,18 +3,17 @@ defmodule ScheduleServerTest do
   doctest ScheduleServer
 
   test "create schedule server" do
-    schedule = %ScheduleServer{}
-    {:ok, schedule_pid} = ScheduleServer.start_link(schedule.state)
-    assert ScheduleServer.write_value(schedule_pid, "new value") == :ok
-    assert ScheduleServer.read_system(schedule_pid) == "new value"
+    schedule = %ScheduleServer{state: :true}
+    ScheduleServer.start_link(schedule.state)
+    assert ScheduleServer.turn_on(schedule.state) == :ok
+    assert ScheduleServer.read_system() == schedule.state
   end
 
   test "shut down schedule server" do
-    schedule = %ScheduleServer{}
-    {:ok, schedule_pid} = ScheduleServer.start_link(schedule.state)
-    assert ScheduleServer.destroy(schedule_pid, "Destroying") == :ok
-    assert ScheduleServer.read_system(schedule_pid) == "Destroying"
-    assert ScheduleServer.shut_down(schedule_pid, "Shut Down...") == :ok
-    assert ScheduleServer.read_system(schedule_pid) == "Shut Down..."
+    schedule = %ScheduleServer{state: :false}
+    ScheduleServer.start_link(schedule.state)
+    assert ScheduleServer.shut_down(schedule.state) == :ok
+    assert ScheduleServer.read_system() == schedule.state
   end
+
 end
